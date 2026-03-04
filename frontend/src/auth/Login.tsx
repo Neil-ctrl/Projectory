@@ -1,13 +1,37 @@
 import { useState } from "react"
 
 function Login({ setIsLogin, setIsAuthenticated }) {
-  const [username, setUsername] = useState("")
+  const [userEmail, setUserEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e) => {
-    e.preventDefault() // Prevent form submission and page refresh
-    if (username == "admin" && password == "123") {
-      setIsAuthenticated(true)
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError("")
+
+    try {
+      const response = await fetch("http://localhost:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: userEmail,
+          password: password
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.message === "Login successful") {
+        setIsAuthenticated(true)
+      }
+      else {
+        setError(data.message)
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      setError("Failed to connect to server")
     }
   }
 
@@ -17,9 +41,9 @@ function Login({ setIsLogin, setIsAuthenticated }) {
       <form onSubmit={handleSubmit}>
         <div>
           <input 
-            placeholder="Username" 
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Email" 
+            value={userEmail}
+            onChange={(e) => setUserEmail(e.target.value)}
           />
         </div>
         <div>
@@ -30,6 +54,9 @@ function Login({ setIsLogin, setIsAuthenticated }) {
             autoComplete="off"
             onChange={(e) => setPassword(e.target.value)}
           />
+        </div>
+        <div>
+          {error && <div style={{color: "red"}}>{error}</div>}
         </div>
         <div>
           <button type="submit">Login</button>
