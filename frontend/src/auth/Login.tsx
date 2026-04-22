@@ -1,6 +1,7 @@
 import { useState } from "react"
+import "../styles/auth.css"
 
-function Login({ setIsLogin, setIsAuthenticated }) {
+function Login({ setIsLogin, setIsAuthenticated, setUser }) {
   const [userEmail, setUserEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -24,6 +25,13 @@ function Login({ setIsLogin, setIsAuthenticated }) {
       const data = await response.json()
 
       if (data.message === "Login successful") {
+        setUser({
+          id: data.user_id,
+          role: data.role,
+          email: userEmail,
+          name: data.name
+        })
+        console.log(data)
         setIsAuthenticated(true)
       }
       else {
@@ -36,17 +44,17 @@ function Login({ setIsLogin, setIsAuthenticated }) {
   }
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
+    <div className="container">
+      <div className="card">
+        <h1>Login</h1>
+
+        <form onSubmit={handleSubmit}>
           <input 
             placeholder="Email" 
             value={userEmail}
             onChange={(e) => setUserEmail(e.target.value)}
           />
-        </div>
-        <div>
+
           <input 
             type="password" 
             placeholder="Password" 
@@ -54,16 +62,18 @@ function Login({ setIsLogin, setIsAuthenticated }) {
             autoComplete="off"
             onChange={(e) => setPassword(e.target.value)}
           />
-        </div>
-        <div>
-          {error && <div style={{color: "red"}}>{error}</div>}
-        </div>
-        <div>
+
+          {error && <div className="error">{error}</div>}
+
           <button type="submit">Login</button>
-        </div>
-      </form>
-      <div>
-        <button onClick={() => setIsLogin(false)}>Go to Register a new account</button>
+        </form>
+
+        <button 
+          className="secondary-btn"
+          onClick={() => setIsLogin(false)}
+        >
+          Go to Register
+        </button>
       </div>
     </div>
   )
